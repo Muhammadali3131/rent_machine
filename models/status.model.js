@@ -1,8 +1,8 @@
 const sequelize = require("../config/db");
 const { DataTypes } = require("sequelize");
 
-const Category = sequelize.define(
-  "category",
+const Status = sequelize.define(
+  "status",
   {
     id: {
       type: DataTypes.INTEGER,
@@ -19,4 +19,4 @@ const Category = sequelize.define(
   }
 );
 
-module.exports = Category;
+module.exports = Status;
