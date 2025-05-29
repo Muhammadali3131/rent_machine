@@ -1,6 +1,6 @@
 const {
   addDistrict,
-  getAllDistricts,
+  findAllDistricts,
   getDistrictById,
   updateDistrict,
   deleteDistrict,
@@ -9,7 +9,7 @@ const {
 const router = require("express").Router();
 
 router.post("/", addDistrict);
-router.get("/", getAllDistricts);
+router.get("/", findAllDistricts);
 router.get("/:id", getDistrictById);
 router.put("/:id", updateDistrict);
 router.delete("/:id", deleteDistrict);

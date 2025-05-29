@@ -1,33 +1,59 @@
 const { sendErrorResponse } = require("../helpers/send_error_response");
 const District = require("../models/district.model");
+const Region = require("../models/region.model");
 
 const addDistrict = async (req, res) => {
   try {
-    const { name } = req.body;
-    const newDistrict = await District.create({ name });
+    const { name, regionId } = req.body;
+
+    const region = await Region.findByPk(regionId);
+    if (!region) {
+      return sendErrorResponse(
+        { message: "Bunday region mavjud emas" },
+        res,
+        400
+      );
+    }
+
+    const newDistrict = await District.create({ name, regionId });
     res.status(201).send({ message: "Yangi district qo'shildi", newDistrict });
   } catch (error) {
     sendErrorResponse(error, res);
   }
 };
 
-const getAllDistricts = async (req, res) => {
+const findAllDistricts = async (req, res) => {
   try {
-    const districts = await pool.query("SELECT * FROM district");
-    res.status(200).send(districts.rows);
+    const district = await District.findAll({
+      include: [
+        {
+          model: Region,
+          attributes: ["name"],
+        },
+      ],
+      attributes: ["id", "name", "regionId"],
+    });
+    res.status(200).send({ message: "Districtlar", district });
   } catch (error) {
-    sendErrorResponse(error, res);
+    sendErrorResponse(error, res, 400);
   }
 };
 
 const getDistrictById = async (req, res) => {
   try {
     const { id } = req.params;
+    const district = await District.findByPk(id, {
+      include: {
+        model: Region,
+        attributes: ["name"],
+      },
+    });
 
-    const district = await pool.query("SELECT * FROM district WHERE id = $1", [
-      id,
-    ]);
-    res.status(200).send(district.rows[0]);
+    if (!district) {
+      return sendErrorResponse({ message: "District topilmadi" }, res, 404);
+    }
+
+    res.status(200).send(district);
   } catch (error) {
     sendErrorResponse(error, res);
   }
@@ -36,14 +62,22 @@ const getDistrictById = async (req, res) => {
 const updateDistrict = async (req, res) => {
   try {
     const { id } = req.params;
-    const { name } = req.body;
+    const { name, regionId } = req.body;
 
-    const updatedDistrict = await pool.query(
-      `UPDATE district
-       SET name = $1 WHERE id = $2`,
-      [name, id]
+    const [updatedRows] = await District.update(
+      { name, regionId },
+      { where: { id } }
     );
-    res.status(200).send({ updatedRows: updatedDistrict.rowCount });
+
+    if (updatedRows === 0) {
+      return sendErrorResponse(
+        { message: "Yangilash uchun district topilmadi" },
+        res,
+        404
+      );
+    }
+
+    res.status(200).send({ updatedRows });
   } catch (error) {
     sendErrorResponse(error, res);
   }
@@ -53,11 +87,17 @@ const deleteDistrict = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const deletedDistrict = await pool.query(
-      "DELETE FROM district WHERE id = $1",
-      [id]
-    );
-    res.status(200).send({ deletedRows: deletedDistrict.rowCount });
+    const deletedRows = await District.destroy({ where: { id } });
+
+    if (deletedRows === 0) {
+      return sendErrorResponse(
+        { message: "O'chirish uchun district topilmadi" },
+        res,
+        404
+      );
+    }
+
+    res.status(200).send({ deletedRows });
   } catch (error) {
     sendErrorResponse(error, res);
   }
@@ -65,7 +105,7 @@ const deleteDistrict = async (req, res) => {
 
 module.exports = {
   addDistrict,
-  getAllDistricts,
+  findAllDistricts,
   getDistrictById,
   updateDistrict,
   deleteDistrict,

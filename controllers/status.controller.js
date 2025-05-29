@@ -13,8 +13,11 @@ const addStatus = async (req, res) => {
 
 const getAllStatuses = async (req, res) => {
   try {
-    const statuses = await pool.query("SELECT * FROM status");
-    res.status(200).send(statuses.rows);
+    const statuses = await Status.findAll({
+      attributes: ["id", "name"],
+      order: [["id", "ASC"]],
+    });
+    res.status(200).send(statuses);
   } catch (error) {
     sendErrorResponse(error, res);
   }
@@ -24,10 +27,13 @@ const getStatusById = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const status = await pool.query("SELECT * FROM status WHERE id = $1", [
-      id,
-    ]);
-    res.status(200).send(status.rows[0]);
+    const status = await Status.findByPk(id);
+
+    if (!status) {
+      return sendErrorResponse({ message: "Status topilmadi" }, res, 404);
+    }
+
+    res.status(200).send(status);
   } catch (error) {
     sendErrorResponse(error, res);
   }
@@ -38,12 +44,13 @@ const updateStatus = async (req, res) => {
     const { id } = req.params;
     const { name } = req.body;
 
-    const updatedStatus = await pool.query(
-      `UPDATE status
-       SET name = $1 WHERE id = $2`,
-      [name, id]
-    );
-    res.status(200).send({ updatedRows: updatedStatus.rowCount });
+    const [updatedRows] = await Status.update({ name }, { where: { id } });
+
+    if (updatedRows === 0) {
+      return sendErrorResponse({ message: "Status topilmadi" }, res, 404);
+    }
+
+    res.status(200).send({ updatedRows });
   } catch (error) {
     sendErrorResponse(error, res);
   }
@@ -53,11 +60,13 @@ const deleteStatus = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const deletedStatus = await pool.query(
-      "DELETE FROM status WHERE id = $1",
-      [id]
-    );
-    res.status(200).send({ deletedRows: deletedStatus.rowCount });
+    const deletedRows = await Status.destroy({ where: { id } });
+
+    if (deletedRows === 0) {
+      return sendErrorResponse({ message: "Status topilmadi" }, res, 404);
+    }
+
+    res.status(200).send({ deletedRows });
   } catch (error) {
     sendErrorResponse(error, res);
   }

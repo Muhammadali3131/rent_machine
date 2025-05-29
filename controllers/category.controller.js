@@ -13,8 +13,8 @@ const addCategory = async (req, res) => {
 
 const getAllCategories = async (req, res) => {
   try {
-    const categories = await pool.query("SELECT * FROM category");
-    res.status(200).send(categorys.rows);
+    const categories = await Category.findAll();
+    res.status(200).send(categories);
   } catch (error) {
     sendErrorResponse(error, res);
   }
@@ -23,11 +23,13 @@ const getAllCategories = async (req, res) => {
 const getCategoryById = async (req, res) => {
   try {
     const { id } = req.params;
+    const category = await Category.findByPk(id);
 
-    const category = await pool.query("SELECT * FROM category WHERE id = $1", [
-      id,
-    ]);
-    res.status(200).send(category.rows[0]);
+    if (!category) {
+      return res.status(404).send({ message: "Kategoriya topilmadi" });
+    }
+
+    res.status(200).send(category);
   } catch (error) {
     sendErrorResponse(error, res);
   }
@@ -38,12 +40,15 @@ const updateCategory = async (req, res) => {
     const { id } = req.params;
     const { name } = req.body;
 
-    const updatedCategory = await pool.query(
-      `UPDATE category
-       SET name = $1 WHERE id = $2`,
-      [name, id]
-    );
-    res.status(200).send({ updatedRows: updatedCategory.rowCount });
+    const [updatedRows] = await Category.update({ name }, { where: { id } });
+
+    if (updatedRows === 0) {
+      return res
+        .status(404)
+        .send({ message: "Yangilash uchun kategoriya topilmadi" });
+    }
+
+    res.status(200).send({ updatedRows });
   } catch (error) {
     sendErrorResponse(error, res);
   }
@@ -52,12 +57,15 @@ const updateCategory = async (req, res) => {
 const deleteCategory = async (req, res) => {
   try {
     const { id } = req.params;
+    const deletedRows = await Category.destroy({ where: { id } });
 
-    const deletedCategory = await pool.query(
-      "DELETE FROM category WHERE id = $1",
-      [id]
-    );
-    res.status(200).send({ deletedRows: deletedCategory.rowCount });
+    if (deletedRows === 0) {
+      return res
+        .status(404)
+        .send({ message: "O'chirish uchun kategoriya topilmadi" });
+    }
+
+    res.status(200).send({ deletedRows });
   } catch (error) {
     sendErrorResponse(error, res);
   }
