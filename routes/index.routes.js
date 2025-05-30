@@ -12,6 +12,9 @@ const imageRoute = require("./image.route");
 const roleRoute = require("./roles.route");
 const UserRoleRouter = require("./user-role.route");
 const authRouter = require("./auth.route");
+const contractRouter = require("./contract.route");
+const paymentRouter = require("./payment.route");
+const reviewRouter = require("./review.route");
 
 router.use("/category", categoryRouter);
 router.use("/region", regionRouter);
@@ -25,5 +28,8 @@ router.use("/image", imageRoute);
 router.use("/role", roleRoute);
 router.use("/userrole", UserRoleRouter);
 router.use("/auth", authRouter);
+router.use("/contract", contractRouter);
+router.use("/payment", paymentRouter);
+router.use("/review", reviewRouter);
 
 module.exports = router;
