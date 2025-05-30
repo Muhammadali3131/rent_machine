@@ -1,7 +1,6 @@
 const { sendErrorResponse } = require("../helpers/send_error_response");
 const Region = require("../models/region.model");
 
-// Yangi region qo'shish
 const addRegion = async (req, res) => {
   try {
     const { name } = req.body;
@@ -13,7 +12,6 @@ const addRegion = async (req, res) => {
   }
 };
 
-// Barcha regionlarni olish
 const getAllRegions = async (req, res) => {
   try {
     const regions = await Region.findAll({
@@ -26,7 +24,6 @@ const getAllRegions = async (req, res) => {
   }
 };
 
-// Region ID orqali olish
 const getRegionById = async (req, res) => {
   try {
     const { id } = req.params;
@@ -43,7 +40,6 @@ const getRegionById = async (req, res) => {
   }
 };
 
-// Regionni yangilash
 const updateRegion = async (req, res) => {
   try {
     const { id } = req.params;
@@ -61,7 +57,6 @@ const updateRegion = async (req, res) => {
   }
 };
 
-// Regionni o'chirish
 const deleteRegion = async (req, res) => {
   try {
     const { id } = req.params;

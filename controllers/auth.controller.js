@@ -1,8 +1,9 @@
 const { sendErrorResponse } = require("../helpers/send_error_response");
 const User = require("../models/users.model");
+const Role = require("../models/roles.model");
 const bcrypt = require("bcrypt");
 const jwtService = require("../services/jwt.service");
-const { config } = require("../config/db");
+const config = require("config");
 
 const login = async (req, res) => {
   try {
