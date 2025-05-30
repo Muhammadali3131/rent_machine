@@ -1,13 +1,14 @@
 const config = require("config");
 const express = require("express");
 const sequelize = require("./config/db");
+const cookieParser = require("cookie-parser");
 
 const PORT = config.get("port");
 
 const indexRouter = require("./routes/index.routes");
 
 const app = express();
-
+app.use(cookieParser())
 app.use(express.json());
 
 app.use("/api", indexRouter);

@@ -7,7 +7,11 @@ const statusRouter = require("./status.route");
 const commissionRouter = require("./commission.route");
 const usersRouter = require("./users.route");
 const usersAddressRouter = require("./users_address.route");
+const machineRoute = require("./machine.route");
+const imageRoute = require("./image.route");
+const roleRoute = require("./roles.route");
 const UserRoleRouter = require("./user-role.route");
+const authRouter = require("./auth.route");
 
 router.use("/category", categoryRouter);
 router.use("/region", regionRouter);
@@ -16,6 +20,10 @@ router.use("/status", statusRouter);
 router.use("/commission", commissionRouter);
 router.use("/users", usersRouter);
 router.use("/usersAddress", usersAddressRouter);
+router.use("/machine", machineRoute);
+router.use("/image", imageRoute);
+router.use("/role", roleRoute);
 router.use("/userrole", UserRoleRouter);
+router.use("/auth", authRouter);
 
 module.exports = router;
